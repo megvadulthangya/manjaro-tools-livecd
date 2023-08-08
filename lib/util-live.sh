@@ -325,8 +325,3 @@ configure_user_root(){
 		cp -an /etc/skel/.config /root/
 	fi
 }
-
-mask_systemd_services(){
-	# don't let the machine sleep or suspend
-	systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
-}

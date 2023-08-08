@@ -59,10 +59,6 @@ livetimer=$(get_timer_ms)
 configure_user_root /
 echo "Configured root user: $(elapsed_time_ms ${livetimer})ms" >> /var/log/manjaro-live.log
 
-livetimer=$(get_timer_ms)
-mask_systemd_services
-echo "Mask some systemd services:  $(elapsed_time_ms ${livetimer})ms" >> /var/log/manjaro-live.log
-
 if [[ -f /usr/bin/samba ]];then
     livetimer=$(get_timer_ms)
     configure_samba
