@@ -170,11 +170,16 @@ configure_displaymanager(){
 			sed -i "s|default.desktop|$default_desktop_file.desktop|g" /etc/mdm/custom.conf
 		fi
 	elif [[ -f /usr/bin/sddm ]];then
+		if [[ -e /etc/sddm.conf.d/kde_settings.conf ]];then
+			conf_file=/etc/sddm.conf.d/kde_settings.conf
+		else
+			conf_file=/etc/sddm.conf
+		fi
 		if $(is_valid_de); then
-			sed -i -e "s|^Session=.*|Session=$default_desktop_file.desktop|" /etc/sddm.conf
+			sed -i -e "s|^Session=.*|Session=$default_desktop_file.desktop|" $conf_file
 		fi
 		if ${autologin};then
-			sed -i -e "s|^User=.*|User=${username}|" /etc/sddm.conf
+			sed -i -e "s|^User=.*|User=${username}|" $conf_file
 		fi
 	elif [[ -f /usr/bin/lxdm ]];then
 		if $(is_valid_de); then
