@@ -5,6 +5,7 @@ SYSCONFDIR = /etc
 
 BIN = \
 	bin/manjaro-live \
+	bin/manjaro-live-setup \
 	bin/mhwd-live \
 	bin/mhwd-live-net
 
