@@ -44,11 +44,14 @@ fi
 # https://forum.manjaro.org/t/188886/79
 # https://github.com/microsoft/WSL/issues/8842#issuecomment-2346387618
 until [ -S /run/dbus/system_bus_socket ];do
+    livetimer=$(get_timer_ms)
     echo "Waiting for DBUS to create socket: $(elapsed_time_ms ${livetimer})ms" >> /var/log/manjaro-live.log
     sleep 1
 done
 if [[ ! -e /run/user/1000/bus ]];then
+    livetimer=$(get_timer_ms)
     echo "Restarting user@1000: $(elapsed_time_ms ${livetimer})ms" >> /var/log/manjaro-live.log
     systemctl restart user@1000
 fi
+livetimer=$(get_timer_ms)
 echo "manjaro-live script completed: $(elapsed_time_ms ${livetimer})ms" >> /var/log/manjaro-live.log
