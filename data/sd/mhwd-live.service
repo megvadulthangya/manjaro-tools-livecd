@@ -1,6 +1,6 @@
 [Unit]
 Description=LiveMedia MHWD Script
-After=systemd-user-sessions.service
+Before=systemd-user-sessions.service
 
 [Service]
 Type=oneshot
