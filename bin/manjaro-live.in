@@ -30,23 +30,14 @@ livetimer=$(get_timer_ms)
 configure_language
 echo "Finished localization: $(elapsed_time_ms ${livetimer})ms" >> /var/log/manjaro-live.log
 
-livetimer=$(get_timer_ms)
-configure_machine_id
-echo "Configured machine-id: $(elapsed_time_ms ${livetimer})ms" >> /var/log/manjaro-live.log
+### DECIDE IF WE DON'T NEED IT ###
+# see also https://forum.manjaro.org/t/188886/90
+#livetimer=$(get_timer_ms)
+#configure_machine_id
+#echo "Configured machine-id: $(elapsed_time_ms ${livetimer})ms" >> /var/log/manjaro-live.log
 
 if [[ -f /usr/bin/samba ]];then
     livetimer=$(get_timer_ms)
     configure_samba
     echo "Configured samba: $(elapsed_time_ms ${livetimer})ms" >> /var/log/manjaro-live.log
 fi
-
-# FIXME
-# https://forum.manjaro.org/t/188886/79
-# https://github.com/microsoft/WSL/issues/8842#issuecomment-2346387618
-if [[ ! -e /run/user/1000/bus ]];then
-    livetimer=$(get_timer_ms)
-    echo "Restarting user@1000: $(elapsed_time_ms ${livetimer})ms" >> /var/log/manjaro-live.log
-    systemctl restart user@1000
-fi
-livetimer=$(get_timer_ms)
-echo "manjaro-live script completed: $(elapsed_time_ms ${livetimer})ms" >> /var/log/manjaro-live.log
