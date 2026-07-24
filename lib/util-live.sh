@@ -289,7 +289,7 @@ configure_language(){
 
     loadkeys "${keytable}"
 
-    locale-gen ${lang}
+    locale-gen
     echo "Configured language: ${lang}" >> /var/log/manjaro-live.log
     echo "Configured keymap: ${keytable}" >> /var/log/manjaro-live.log
     echo "Configured timezone: ${timezone}" >> /var/log/manjaro-live.log
