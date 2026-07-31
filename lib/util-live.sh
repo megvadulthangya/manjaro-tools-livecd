@@ -228,29 +228,20 @@ find_legacy_keymap(){
 		X11_LAYOUT=${mapping[1]}
 		X11_MODEL=${mapping[2]}
 		X11_VARIANT=${mapping[3]}
-		x11_OPTIONS=${mapping[4]}
+		X11_OPTIONS=${mapping[4]}
 	done < $file
 }
 
 write_x11_config(){
-	# find a x11 layout that matches the keymap
-	# in isolinux if you select a keyboard layout and a language that doesnt match this layout,
-	# it will provide the correct keymap, but not kblayout value
-	local X11_LAYOUT=
-	local X11_MODEL="pc105"
-	local X11_VARIANT=""
-	local X11_OPTIONS="terminate:ctrl_alt_bksp"
+	# write X11 keyboard configuration using previously determined
+	# X11_LAYOUT, X11_MODEL, X11_VARIANT, X11_OPTIONS (from find_legacy_keymap)
+	# fall back to keytable if layout is empty
+	[[ -z "$X11_LAYOUT" ]] && X11_LAYOUT="${keytable}"
+	[[ -z "$X11_MODEL" ]] && X11_MODEL="pc105"
+	[[ -z "$X11_VARIANT" ]] && X11_VARIANT=""
+	[[ -z "$X11_OPTIONS" ]] && X11_OPTIONS="terminate:ctrl_alt_bksp"
 
-	find_legacy_keymap
-
-	# layout not found, use KBLAYOUT
-	if [[ -z "$X11_LAYOUT" ]]; then
-		X11_LAYOUT="${keytable}"
-	fi
-
-	# create X11 keyboard layout config
 	mkdir -p "/etc/X11/xorg.conf.d"
-
 	local XORGKBLAYOUT="/etc/X11/xorg.conf.d/00-keyboard.conf"
 
 	echo "" >> "$XORGKBLAYOUT"
@@ -285,7 +276,15 @@ configure_language(){
     echo "LANG=${lang}.UTF-8" > /etc/locale.conf
     ln -sf /usr/share/zoneinfo/${timezone} /etc/localtime
 
+    # Determine X11 layout from keytable
+    find_legacy_keymap
+
     write_x11_config
+
+    # Also set the keymap via localectl so that GNOME/KDE Wayland sessions pick it up
+    if command -v localectl >/dev/null 2>&1 && [[ -n "${X11_LAYOUT}" ]]; then
+        localectl set-x11-keymap "${X11_LAYOUT}" "${X11_MODEL}" "${X11_VARIANT}" "${X11_OPTIONS}"
+    fi
 
     loadkeys "${keytable}"
 
