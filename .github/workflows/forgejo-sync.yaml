@@ -1,0 +1,52 @@
+name: Sync master from Manjaro Forgejo
+
+on:
+  schedule:
+    - cron: '0 5 * * *'   # naponta 05:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    env:
+      GIT_HTTP_TIMEOUT: 300
+      GIT_HTTP_LOW_SPEED_LIMIT: 500
+      GIT_HTTP_LOW_SPEED_TIME: 60
+
+    steps:
+      - name: Checkout GitHub repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add Forgejo remote
+        run: |
+          git remote remove forgejo 2>/dev/null || true
+          git remote add forgejo https://code.manjaro.org/tools/manjaro-tools-livecd.git
+
+      - name: Fetch Forgejo with retry
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 5
+          max_attempts: 100
+          retry_wait_seconds: 30
+          command: git fetch forgejo
+
+      - name: Configure git user
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync master branch
+        run: |
+          git checkout -B master origin/master
+          if ! git merge forgejo/master --no-edit; then
+            echo "::error::Merge conflict occurred while syncing master branch. Manual intervention required."
+            git merge --abort || true
+            exit 1
+          fi
+          git push origin master
