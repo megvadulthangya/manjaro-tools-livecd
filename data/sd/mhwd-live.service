@@ -1,5 +1,7 @@
 [Unit]
 Description=LiveMedia MHWD Script
+Requires=manjaro-live.service pacman-init.service
+After=manjaro-live.service pacman-init.service
 Before=systemd-user-sessions.service
 
 [Service]
